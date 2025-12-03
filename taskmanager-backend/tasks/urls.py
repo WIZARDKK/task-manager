@@ -8,7 +8,10 @@ from .views import (
     LogoutView,
     UserProfileView,
     ChangePasswordView,
-    ChangeEmailView
+    ChangeEmailView,
+    RequestPasswordResetView,
+    VerifyOTPView,
+    ResetPasswordView
 )
 
 router = DefaultRouter()
@@ -29,6 +32,17 @@ urlpatterns = [
     path('auth/change-email/',
          ChangeEmailView.as_view(),
          name='change_email'),
+
+    # ============= PASSWORD RESET ENDPOINTS =============
+    path('auth/forgot-password/',
+         RequestPasswordResetView.as_view(),
+         name='forgot_password'),
+    path('auth/verify-otp/',
+         VerifyOTPView.as_view(),
+         name='verify_otp'),
+    path('auth/reset-password/',
+         ResetPasswordView.as_view(),
+         name='reset_password'),
 
     # ============= TASK ENDPOINTS =============
     path('', include(router.urls)),

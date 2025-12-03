@@ -21,6 +21,11 @@ export const API_ENDPOINTS = {
   CHANGE_PASSWORD: '/auth/change-password/',
   CHANGE_EMAIL: '/auth/change-email/',
   
+  // Password Reset
+  FORGOT_PASSWORD: '/auth/forgot-password/',
+  VERIFY_OTP: '/auth/verify-otp/',
+  RESET_PASSWORD: '/auth/reset-password/',
+  
   // Tasks
   TASKS: '/tasks/',
   TASK_DETAIL: (id: number) => `/tasks/${id}/`,
