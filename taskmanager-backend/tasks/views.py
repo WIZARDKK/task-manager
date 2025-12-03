@@ -6,14 +6,19 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Task
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Task, PasswordResetOTP
 from .serializers import (
     TaskSerializer,
     RegisterSerializer,
     LoginSerializer,
     UserSerializer,
     ChangePasswordSerializer,
-    ChangeEmailSerializer
+    ChangeEmailSerializer,
+    RequestPasswordResetSerializer,
+    VerifyOTPSerializer,
+    ResetPasswordSerializer
 )
 
 
@@ -188,4 +193,109 @@ class ChangeEmailView(APIView):
         return Response({
             'message': 'Email changed successfully',
             'email': user.email
+        }, status=status.HTTP_200_OK)
+
+
+# ============= PASSWORD RESET VIEWS =============
+class RequestPasswordResetView(APIView):
+    """View for requesting password reset OTP via email"""
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = RequestPasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
+        user = User.objects.get(email=email)
+
+        # Generate OTP
+        otp_code = PasswordResetOTP.generate_otp()
+
+        # Create OTP record
+        otp = PasswordResetOTP.objects.create(
+            user=user,
+            otp_code=otp_code
+        )
+
+        # Send OTP via email
+        subject = 'Password Reset OTP - Task Manager'
+        message = f'''
+Hello {user.first_name or user.username},
+
+You requested to reset your password for Task Manager.
+
+Your OTP code is: {otp_code}
+
+This code will expire in 10 minutes.
+
+If you didn't request this, please ignore this email.
+
+Best regards,
+Task Manager Team
+        '''
+
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+
+            return Response({
+                'message': 'OTP sent successfully to your email',
+                'email': email
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # If email fails, delete the OTP and return error
+            otp.delete()
+            return Response({
+                'error': f'Failed to send email: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class VerifyOTPView(APIView):
+    """View for verifying OTP code without resetting password"""
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = VerifyOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response({
+            'message': 'OTP verified successfully',
+            'email': serializer.validated_data['email']
+        }, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(APIView):
+    """View for resetting password with OTP"""
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data['user']
+        otp = serializer.validated_data['otp']
+        new_password = serializer.validated_data['new_password']
+
+        # Set new password
+        user.set_password(new_password)
+        user.save()
+
+        # Mark OTP as used
+        otp.is_used = True
+        otp.save()
+
+        # Invalidate all existing OTPs for this user
+        PasswordResetOTP.objects.filter(
+            user=user,
+            is_used=False
+        ).update(is_used=True)
+
+        return Response({
+            'message': 'Password reset successfully'
         }, status=status.HTTP_200_OK)

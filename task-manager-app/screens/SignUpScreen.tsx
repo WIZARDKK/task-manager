@@ -4,13 +4,13 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 import { Ionicons } from '@expo/vector-icons';

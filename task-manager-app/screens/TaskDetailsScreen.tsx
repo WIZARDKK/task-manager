@@ -4,12 +4,12 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
@@ -113,18 +113,6 @@ const TaskDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  const handleDueDatePress = () => {
-    Alert.alert('Due Date', 'Date editing will be implemented');
-  };
-
-  const handleCategoryPress = () => {
-    Alert.alert('Category', 'Category editing will be implemented');
-  };
-
-  const handleReminderPress = () => {
-    Alert.alert('Reminder', 'Reminder feature coming soon');
-  };
-
   const handleDeleteTask = () => {
     Alert.alert(
       'Delete Task',
@@ -211,7 +199,7 @@ const TaskDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
             label="Due Date"
             value={formatDueDate(task.due_date)}
             valueColor="#2563EB"
-            onPress={handleDueDatePress}
+            showChevron={false}
           />
 
           <TaskDetailRow
@@ -220,7 +208,7 @@ const TaskDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
             iconBgColor="#DBEAFE"
             label="Category"
             value={task.category}
-            onPress={handleCategoryPress}
+            showChevron={false}
           />
 
           <TaskDetailRow
@@ -229,7 +217,7 @@ const TaskDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
             iconBgColor="#D1FAE5"
             label="Reminder"
             value="No reminder set"
-            onPress={handleReminderPress}
+            showChevron={false}
           />
         </View>
 

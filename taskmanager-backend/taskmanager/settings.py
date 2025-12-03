@@ -179,3 +179,17 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_ALL_ORIGINS = True  # For development only
 CORS_ALLOW_CREDENTIALS = True
+
+# Email Configuration
+# For development, print emails to console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production with Gmail, uncomment and configure:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'syntaxsurendra@gmail.com'
+EMAIL_HOST_PASSWORD = 'csqzxvdfmhvucltz'
+# Use App Password, not regular password
+DEFAULT_FROM_EMAIL = 'noreply@taskmanager.com'

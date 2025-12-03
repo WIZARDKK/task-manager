@@ -335,3 +335,87 @@ export const changeEmail = async (password: string, newEmail: string): Promise<{
   
   return data;
 };
+
+/**
+ * Request password reset - sends OTP to email
+ */
+export const requestPasswordReset = async (email: string) => {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.FORGOT_PASSWORD}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to send OTP');
+  }
+
+  return await response.json();
+};
+
+/**
+ * Verify OTP code
+ */
+export const verifyOTP = async (email: string, otp_code: string) => {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.VERIFY_OTP}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, otp_code }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    // Handle validation errors from DRF
+    if (errorData.non_field_errors) {
+      throw new Error(errorData.non_field_errors[0]);
+    }
+    throw new Error(errorData.error || 'Invalid OTP code');
+  }
+
+  return await response.json();
+};
+
+/**
+ * Reset password with OTP
+ */
+export const resetPassword = async (
+  email: string,
+  otp_code: string,
+  new_password: string,
+  confirm_password: string
+) => {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESET_PASSWORD}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      otp_code,
+      new_password,
+      confirm_password,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    // Handle validation errors
+    if (errorData.non_field_errors) {
+      throw new Error(errorData.non_field_errors[0]);
+    }
+    if (errorData.confirm_password) {
+      throw new Error(errorData.confirm_password[0]);
+    }
+    if (errorData.new_password) {
+      throw new Error(errorData.new_password[0]);
+    }
+    throw new Error(errorData.error || 'Failed to reset password');
+  }
+
+  return await response.json();
+};

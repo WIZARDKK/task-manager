@@ -4,13 +4,13 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 import AppLogo from '../components/login/AppLogo';
@@ -89,7 +89,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleForgotPassword = () => {
-    Alert.alert('Forgot Password', 'Password reset screen will open');
+    navigation.navigate('ForgotPassword');
   };
 
   const handleGoogleLogin = () => {
