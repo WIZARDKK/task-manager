@@ -7,8 +7,8 @@
 
 // Change this based on your setup:
 // export const API_BASE_URL = 'http://10.0.2.2:8000/api';  // Android Emulator
-// export const API_BASE_URL = 'http://localhost:8000/api';  // iOS Simulator
- export const API_BASE_URL = 'http://192.168.1.111:8000/api';  // Physical Device (Expo Go) - Wi-Fi
+//export const API_BASE_URL = 'http://localhost:8000/api';  // iOS Simulator
+export const API_BASE_URL = 'http://192.168.1.111:8000/api';  // Physical Device (Expo Go) - Wi-Fi
 //export const API_BASE_URL = 'http://10.83.57.205:8000/api';  // VPN IP - Try this if Wi-Fi doesn't work
 
 // API Endpoints

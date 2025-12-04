@@ -17,6 +17,10 @@ db.sqlite3-journal
 /media
 /staticfiles
 db_config.py
+.env
+
+# Deployment guides (optional - can be kept in repo)
+AMAZON_LINUX_GUIDE.md
 
 # IDE
 .vscode/

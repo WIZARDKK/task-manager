@@ -1,0 +1,22 @@
+[Unit]
+Description=Gunicorn daemon for Task Manager Backend
+After=network.target
+
+[Service]
+Type=notify
+User=ec2-user
+Group=nginx
+WorkingDirectory=/home/ec2-user/task-manager/taskmanager-backend
+Environment="PATH=/home/ec2-user/task-manager/taskmanager-backend/venv/bin"
+ExecStart=/home/ec2-user/task-manager/taskmanager-backend/venv/bin/gunicorn \
+          --config /home/ec2-user/task-manager/taskmanager-backend/gunicorn_config.py \
+          taskmanager.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
