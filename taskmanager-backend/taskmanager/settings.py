@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,15 +22,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    'django-insecure-m(_hb)cwz795*$u&v9c08=(3wonjk35$gb(th3'
-    '8pkg8lop^8f='
+SECRET_KEY = config(
+    'SECRET_KEY',
+    default='django-insecure-m(_hb)cwz795*$u&v9c08=(3wonjk35$gb(th3'
+            '8pkg8lop^8f='
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.111']
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,192.168.1.111',
+    cast=Csv()
+)
 
 
 # Application definition
@@ -81,19 +87,19 @@ WSGI_APPLICATION = 'taskmanager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-try:
-    from .db_config import DB_CONFIG
-    DATABASES = {
-        'default': DB_CONFIG
+DATABASES = {
+    'default': {
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
+        'NAME': config('DB_NAME', default='taskmanager_db'),
+        'USER': config('DB_USER', default='root'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='3306'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
-except ImportError:
-    # Fallback to SQLite if db_config.py doesn't exist
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 
 # Password validation
@@ -171,25 +177,28 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
 
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8081',
-    'http://192.168.1.111:8081',
-]
-
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# CORS Configuration (for React Native mobile app)
+CORS_ALLOW_ALL_ORIGINS = config(
+    'CORS_ALLOW_ALL_ORIGINS',
+    default=True,
+    cast=bool
+)
 CORS_ALLOW_CREDENTIALS = True
 
 # Email Configuration
-# For development, print emails to console
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# For production with Gmail, uncomment and configure:
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'syntaxsurendra@gmail.com'
-EMAIL_HOST_PASSWORD = 'csqzxvdfmhvucltz'
-# Use App Password, not regular password
-DEFAULT_FROM_EMAIL = 'noreply@taskmanager.com'
+EMAIL_BACKEND = config(
+    'EMAIL_BACKEND',
+    default='django.core.mail.backends.smtp.EmailBackend'
+)
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='syntaxsurendra@gmail.com')
+EMAIL_HOST_PASSWORD = config(
+    'EMAIL_HOST_PASSWORD',
+    default='csqzxvdfmhvucltz'
+)
+DEFAULT_FROM_EMAIL = config(
+    'DEFAULT_FROM_EMAIL',
+    default='noreply@taskmanager.com'
+)
